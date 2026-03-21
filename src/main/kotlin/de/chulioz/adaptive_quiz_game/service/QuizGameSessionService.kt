@@ -11,7 +11,7 @@ class QuizGameSessionService(
 ) {
     private var quizGameSession: QuizGameSession? = null
 
-    fun startRoundWhenReady(): QuizGameSession {
+    fun startGameSessionWhenReady(desiredNumberOfFullRounds: Int): QuizGameSession {
         val participants = participantCollectorService.completedPlayersSnapshot()
             ?: error(
                 "Cannot start quiz round yet. Missing participants: " +
@@ -22,6 +22,7 @@ class QuizGameSessionService(
             players = participants,
             scoresheet = participants.map { Score(player = it, score = 0) },
             turns = emptyList(),
+            desiredNumberOfTurns = desiredNumberOfFullRounds * participants.size,
         )
 
         quizGameSession = newQuizGameSession

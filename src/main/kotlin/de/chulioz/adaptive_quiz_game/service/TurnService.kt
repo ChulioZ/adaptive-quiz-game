@@ -9,8 +9,12 @@ class TurnService(
     private val quizGameSessionService: QuizGameSessionService,
     private val questionService: QuestionService
 ) {
-    fun nextTurn(): Turn {
+    fun nextTurn(): Turn? {
         val currentGameSession = quizGameSessionService.currentGameSession() ?: error("No current game session found.")
+
+        if (currentGameSession.isFinished()) {
+            return null
+        }
 
         val nextPlayer = nextPlayer(currentGameSession.players, currentGameSession.turns)
         val nextQuestion = questionService.nextQuestion(nextPlayer, currentGameSession.turns)

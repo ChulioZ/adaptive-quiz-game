@@ -15,7 +15,7 @@ class QuizGameSessionServiceTest {
         collectorService.join(Player(age = 7, name = "Ella"))
 
         assertFailsWith<IllegalStateException> {
-            quizGameSessionService.startRoundWhenReady()
+            quizGameSessionService.startGameSessionWhenReady(desiredNumberOfFullRounds = 1)
         }
     }
 
@@ -25,12 +25,13 @@ class QuizGameSessionServiceTest {
         collectorService.join(Player(age = 7, name = "Ella"))
         collectorService.join(Player(age = 8, name = "Finn"))
 
-        val round = quizGameSessionService.startRoundWhenReady()
+        val round = quizGameSessionService.startGameSessionWhenReady(desiredNumberOfFullRounds = 3)
 
         assertEquals(2, round.players.size)
         assertTrue(round.turns.isEmpty())
         assertEquals(listOf(0, 0), round.scoresheet.map { it.score })
         assertEquals(round.players, round.scoresheet.map { it.player })
+        assertEquals(6, round.desiredNumberOfTurns)
     }
 
     @Test
@@ -58,7 +59,7 @@ class QuizGameSessionServiceTest {
         val playerTwo = Player(age = 8, name = "Finn")
         collectorService.join(playerOne)
         collectorService.join(playerTwo)
-        quizGameSessionService.startRoundWhenReady()
+        quizGameSessionService.startGameSessionWhenReady(desiredNumberOfFullRounds = 1)
 
         val firstTurn =
             Turn(
