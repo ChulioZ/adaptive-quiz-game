@@ -72,4 +72,20 @@ class QuizGameSessionServiceTest {
         assertEquals(1, currentSession?.turns?.size)
         assertEquals(firstTurn, currentSession?.turns?.first())
     }
+
+    @Test
+    fun `add point increases matching player score only`() {
+        collectorService.openRegistration(expectedPlayerCount = 2)
+        val playerOne = Player(age = 7, name = "Ella")
+        val playerTwo = Player(age = 8, name = "Finn")
+        collectorService.join(playerOne)
+        collectorService.join(playerTwo)
+        quizGameSessionService.startGameSessionWhenReady(desiredNumberOfFullRounds = 1)
+
+        quizGameSessionService.addPoint(playerOne)
+
+        val scoresheet = quizGameSessionService.currentGameSession()?.scoresheet
+        assertEquals(1, scoresheet?.first { it.player == playerOne }?.score)
+        assertEquals(0, scoresheet?.first { it.player == playerTwo }?.score)
+    }
 }

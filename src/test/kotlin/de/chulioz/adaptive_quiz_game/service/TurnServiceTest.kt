@@ -1,5 +1,6 @@
 package de.chulioz.adaptive_quiz_game.service
 
+import de.chulioz.adaptive_quiz_game.domain.Answer
 import de.chulioz.adaptive_quiz_game.domain.Player
 import de.chulioz.adaptive_quiz_game.domain.Question
 import de.chulioz.adaptive_quiz_game.domain.Turn
@@ -120,6 +121,68 @@ class TurnServiceTest {
 
         assertNull(nextTurn)
         assertEquals(listOf(firstExistingTurn, secondExistingTurn), sessionService.currentGameSession()?.turns)
+    }
+
+    @Test
+    fun `evaluate answer returns correct and increments score`() {
+        val players =
+            startSession(
+                desiredNumberOfFullRounds = 1,
+                Player(age = 8, name = "Ada"),
+                Player(age = 9, name = "Ben"),
+            )
+        val turn =
+            Turn(
+                player = players.first(),
+                question =
+                    Question(
+                        question = "Q1",
+                        answers =
+                            listOf(
+                                Answer(answer = "A", id = 1, correct = true),
+                                Answer(answer = "B", id = 2, correct = false),
+                            ),
+                    ),
+            )
+        sessionService.addTurn(turn)
+
+        val result = turnService.evaluateAnswer(turn, answerId = 1)
+
+        assertEquals(TurnEvaluationResult.CORRECT, result)
+        val updatedScores = sessionService.currentGameSession()?.scoresheet.orEmpty()
+        assertEquals(1, updatedScores.first { it.player == players.first() }.score)
+        assertEquals(0, updatedScores.first { it.player == players[1] }.score)
+    }
+
+    @Test
+    fun `evaluate answer returns incorrect and does not increment score`() {
+        val players =
+            startSession(
+                desiredNumberOfFullRounds = 1,
+                Player(age = 8, name = "Ada"),
+                Player(age = 9, name = "Ben"),
+            )
+        val turn =
+            Turn(
+                player = players.first(),
+                question =
+                    Question(
+                        question = "Q1",
+                        answers =
+                            listOf(
+                                Answer(answer = "A", id = 1, correct = true),
+                                Answer(answer = "B", id = 2, correct = false),
+                            ),
+                    ),
+            )
+        sessionService.addTurn(turn)
+
+        val result = turnService.evaluateAnswer(turn, answerId = 2)
+
+        assertEquals(TurnEvaluationResult.INCORRECT, result)
+        val updatedScores = sessionService.currentGameSession()?.scoresheet.orEmpty()
+        assertEquals(0, updatedScores.first { it.player == players.first() }.score)
+        assertEquals(0, updatedScores.first { it.player == players[1] }.score)
     }
 
     private fun startSession(desiredNumberOfFullRounds: Int = 1, vararg players: Player): List<Player> {

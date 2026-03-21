@@ -1,3 +1,8 @@
 spring:
   application:
     name: adaptive-quiz-game
+
+quiz:
+  cli:
+    autostart: true
+    mode: disabled

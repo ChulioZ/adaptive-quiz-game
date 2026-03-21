@@ -13,4 +13,12 @@ data class QuizGameSession(
     fun isFinished(): Boolean {
         return turns.size >= desiredNumberOfTurns
     }
+
+    fun addOnePoint(player: Player): QuizGameSession {
+        return copy(
+            scoresheet = scoresheet.map { score ->
+                if (score.player == player) score.addOne() else score
+            },
+        )
+    }
 }
