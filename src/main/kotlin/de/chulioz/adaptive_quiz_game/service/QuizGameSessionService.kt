@@ -2,6 +2,7 @@ package de.chulioz.adaptive_quiz_game.service
 
 import de.chulioz.adaptive_quiz_game.domain.QuizGameSession
 import de.chulioz.adaptive_quiz_game.domain.Score
+import de.chulioz.adaptive_quiz_game.domain.Turn
 import org.springframework.stereotype.Service
 
 @Service
@@ -28,5 +29,10 @@ class QuizGameSessionService(
         return newQuizGameSession
     }
 
-    fun currentRound(): QuizGameSession? = quizGameSession
+    fun currentGameSession(): QuizGameSession? = quizGameSession
+
+    fun addTurn(turn: Turn) {
+        checkNotNull(quizGameSession) { "No current game session found." }
+        quizGameSession = quizGameSession!!.addTurn(turn)
+    }
 }

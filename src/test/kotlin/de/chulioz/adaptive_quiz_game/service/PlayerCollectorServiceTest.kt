@@ -43,4 +43,29 @@ class PlayerCollectorServiceTest {
             service.join(Player(age = 9, name = "Dana"))
         }
     }
+
+    @Test
+    fun `opening registration with less than two participants fails`() {
+        assertFailsWith<IllegalArgumentException> {
+            service.openRegistration(expectedPlayerCount = 1)
+        }
+    }
+
+    @Test
+    fun `status methods return pre-registration defaults`() {
+        assertEquals(0, service.missingPlayersCount())
+        assertFalse(service.hasAllJoined())
+        assertNull(service.completedPlayersSnapshot())
+    }
+
+    @Test
+    fun `joining above expected number of participants fails`() {
+        service.openRegistration(expectedPlayerCount = 2)
+        service.join(Player(age = 11, name = "Ada"))
+        service.join(Player(age = 12, name = "Ben"))
+
+        assertFailsWith<IllegalStateException> {
+            service.join(Player(age = 13, name = "Chris"))
+        }
+    }
 }
